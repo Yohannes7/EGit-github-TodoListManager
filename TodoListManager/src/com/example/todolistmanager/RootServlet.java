@@ -106,6 +106,8 @@ public class RootServlet extends HttpServlet {
 			if (req.getParameter("save") != null) {
 		         saveAction(req, resp,existingUser);
 		         pm.makePersistent(existingUser);
+		    } else if (req.getParameter("delete") != null && usingTodo != null) {
+		         pm.deletePersistent(usingTodo);
 		    } 
 			pm.close();
 		}
