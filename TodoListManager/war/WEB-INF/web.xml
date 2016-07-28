@@ -13,5 +13,14 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		<servlet-name>Root</servlet-name>
 		<url-pattern>/</url-pattern>
 	</servlet-mapping>
-
+	
+	<servlet>
+		<servlet-name>Edit</servlet-name>
+		<servlet-class>com.example.todolistmanager.EditServlet</servlet-class>
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Edit</servlet-name>
+		<url-pattern>/edit</url-pattern>
+	</servlet-mapping>
 </web-app>

@@ -123,10 +123,24 @@ public class RootServlet extends HttpServlet {
 			    		pm.makePersistent(usingTodo);
 			      	}catch(Exception e){} 
 		    	}
+		    	
+		    } else if (req.getParameter("edit") != null && usingTodo != null) {
+				req.setAttribute("currentTodo",usingTodo);
+				redirection = "edit";
+		    }
 			pm.close();
 		}
+		
+		if (redirection!= ""){
+			try {
+				RequestDispatcher reqDispatcher = req.getRequestDispatcher("/WEB-INF/edit.jsp");
+				reqDispatcher.forward(req, resp);
+			} catch (ServletException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-		resp.sendRedirect("/");
+		else{resp.sendRedirect("/"+redirection);}
 	}
 
 	private void saveAction(HttpServletRequest req, HttpServletResponse resp, UserT user){
