@@ -67,7 +67,7 @@ public class Todo implements Serializable{
 	{
  		this.user=us;
 	}  
-                     
+                      
 	// return a task from id
 	public static Todo getTodoUsingTheKey(String key, UserT user) {
         Todo knownTodo = null;
