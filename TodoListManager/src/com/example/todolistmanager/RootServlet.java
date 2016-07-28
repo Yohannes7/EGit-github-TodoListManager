@@ -31,45 +31,7 @@ public class RootServlet extends HttpServlet {
 		// set the response type to be html text
 		resp.setContentType("text/html");
 		
-		// get access to the google user service
-		UserService us = UserServiceFactory.getUserService();
-		User user = us.getCurrentUser();
-		String login_url = us.createLoginURL("/");
-		String logout_url = us.createLogoutURL("/");
-		
-		// attach a few things to the request such that we can access them in the jsp
-		req.setAttribute("user", user);
-		req.setAttribute("login_url", login_url);
-		req.setAttribute("logout_url", logout_url);
-				
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		//MemcacheService ms = MemcacheServiceFactory.getMemcacheService();
-			
-		// get access to the user. if they do not exist in the datastore then
-		// store a default version of them. of course we have to check that a user has logged in first
-		UserT existingUser=null;
-		if(user != null) {
-			pm.getFetchPlan().setGroup(FetchGroup.ALL);
-			Key userKey = KeyFactory.createKey(UserT.class.getSimpleName(), user.getUserId());
-			try {
-	            existingUser = pm.getObjectById(UserT.class, userKey);
-	        } catch (JDOObjectNotFoundException e) {
-	        	existingUser = new UserT();
-	        	existingUser.setID(userKey);
-	            existingUser.setEmail(user.getEmail());
-	            pm.makePersistent(existingUser);
-	        }	
-			for(int i = 0; i < existingUser.getTodos().size();i++){
-				System.out.println(existingUser.getTodos().get(i).getName());
-			}
-			
-			req.setAttribute("currentUser",existingUser);
-			//List<Todo> todoList = existingUser.getTodos();
-			
-			pm.close();
-
-			System.out.println("user is: " + existingUser.getId());
-		}
+	
 
 		// get access to a request dispatcher and forward onto the root.jsp file
 		RequestDispatcher rd = req.getRequestDispatcher("/WEB-INF/root.jsp");
@@ -79,99 +41,6 @@ public class RootServlet extends HttpServlet {
 
 	// simple post method that updates a users preferences with new email information
 	public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-		String redirection = "";
-		UserService us = UserServiceFactory.getUserService();
-		User user = us.getCurrentUser();
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		//MemcacheService ms = MemcacheServiceFactory.getMemcacheService();
-
-		// get access to the user. if they do not exist in the datastore then
-		// store a default version of them. of course we have to check that a user has
-		// logged in first
-		UserT existingUser=null;
-		if(user != null) {
-			pm.getFetchPlan().setGroup(FetchGroup.ALL);
-			Key userKey = KeyFactory.createKey(UserT.class.getSimpleName(), user.getUserId());
-			try {
-	            existingUser = pm.getObjectById(UserT.class, userKey);
-	        } catch (JDOObjectNotFoundException e) {
-	            //existingUser = new UserT(user.getEmail());
-	            existingUser = new UserT();
-	        	existingUser.setID(userKey);
-	        	existingUser.setEmail(user.getEmail());
-	            pm.makePersistent(existingUser);
-	        }
-			Todo usingTodo=	Todo.getTodoUsingTheKey(req.getParameter("kid"), existingUser);
-			
-			if (req.getParameter("save") != null) {
-		         saveAction(req, resp,existingUser);
-		         pm.makePersistent(existingUser);
-		    } else if (req.getParameter("delete") != null && usingTodo != null) {
-		         pm.deletePersistent(usingTodo);
-		    } else if (req.getParameter("savestate") != null && usingTodo != null) { 
-		    	
-		    	String PreviousState = usingTodo.getState();
-		    	String UpdatedState="";
-		    	
-		    	if(req.getParameter("state") != null){
-		    		UpdatedState=req.getParameter("state");
-				}else{UpdatedState="something strange happened";
-				}
-		    	if (PreviousState != UpdatedState){
-			    	try{
-			      		usingTodo.setState(UpdatedState);
-			    		pm.makePersistent(usingTodo);
-			      	}catch(Exception e){} 
-		    	}
-		    	
-		    } else if (req.getParameter("edit") != null && usingTodo != null) {
-				req.setAttribute("currentTodo",usingTodo);
-				redirection = "edit";
-		    }
-			pm.close();
-		}
-		
-		if (redirection!= ""){
-			try {
-				RequestDispatcher reqDispatcher = req.getRequestDispatcher("/WEB-INF/edit.jsp");
-				reqDispatcher.forward(req, resp);
-			} catch (ServletException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		else{resp.sendRedirect("/"+redirection);}
-	}
-
-	private void saveAction(HttpServletRequest req, HttpServletResponse resp, UserT user){
-			
-		Todo settings;
-	
-		// get the new task from the form
-		String newTask = "";
-		String newTodo = "";
-		String state = "incomplete";
-		try{
-			newTask = req.getParameter("t_name");
-			newTodo = req.getParameter("t_task");
-		} catch(Exception e) {return;}
-				
-		Date mydate = new Date();
-		
-		// update the task data in the datastore and then redirect to /
-		Key todoKey = KeyFactory.createKey("Todo", mydate.getTime());
-		try {
-			settings = new Todo();
-			settings.setUser(user);
-			settings.setName(newTask);
-			settings.setTask(newTodo);
-			settings.setDate(mydate);
-			settings.setID(todoKey);
-			settings.setState(state);
-			user.getTodos().add(settings);
-			
-		} catch (Exception e) {	// will only fail if the datastore goes down as this is already in the datastore  
-		}
 		
 	}	
 }
