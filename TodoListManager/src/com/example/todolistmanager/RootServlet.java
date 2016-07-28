@@ -108,10 +108,24 @@ public class RootServlet extends HttpServlet {
 		         pm.makePersistent(existingUser);
 		    } else if (req.getParameter("delete") != null && usingTodo != null) {
 		         pm.deletePersistent(usingTodo);
-		    } 
+		    } else if (req.getParameter("savestate") != null && usingTodo != null) { 
+		    	
+		    	String PreviousState = usingTodo.getState();
+		    	String UpdatedState="";
+		    	
+		    	if(req.getParameter("state") != null){
+		    		UpdatedState=req.getParameter("state");
+				}else{UpdatedState="something strange happened";
+				}
+		    	if (PreviousState != UpdatedState){
+			    	try{
+			      		usingTodo.setState(UpdatedState);
+			    		pm.makePersistent(usingTodo);
+			      	}catch(Exception e){} 
+		    	}
 			pm.close();
 		}
-		
+		}
 		resp.sendRedirect("/");
 	}
 

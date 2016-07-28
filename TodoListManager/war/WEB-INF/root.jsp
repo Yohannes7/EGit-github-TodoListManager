@@ -209,6 +209,44 @@
 		  	}
 		}
 		
+		var a;
+		$(document).ready(function(){
+		    $(".toggle").click(function(){
+		    	if ($(this).is(':checked')) {
+	   				$(this).siblings('label').html('complete');
+	   				a="complete";
+	   				//alert(a);
+	 			} else {
+	   				$(this).siblings('label').html('incomplete');
+	   				a="incomplete";
+	   				//alert(a);
+	 			}
+		    });
+		});
+		
+		function state_submit(){
+		      //var myparam = "abc";
+		      var theForm = document.forms['stateForm'];
+		      var b = a;
+		      if (b != "complete" && b != "incomplete"){
+		    	  alert("make a choice first.");
+		      }else{
+				 // alert(b + "ok");
+			     // add hidden field to your form name="myparam" and value="abc"
+			     
+			     var input = document.createElement('input');
+			    input.type = 'hidden';
+			    input.name = 'state';
+			    input.value = b;
+			    alert(b);
+			    theForm.appendChild(input);
+			    //alert("appended");
+			    theForm.submit();		     
+			    alert("submitted");
+			    
+		      }
+		}
+				
 		</script>
 	</body>
 </html>
