@@ -2,7 +2,7 @@ package com.example.todolistmanager;
 
 import java.io.Serializable;
 import java.util.Date;
-
+import java.util.List;
 
 import com.example.todolistmanager.UserT;
 
@@ -13,7 +13,7 @@ import javax.jdo.annotations.PrimaryKey;
 
 import com.google.appengine.api.datastore.Key;
        
-      
+    
 @PersistenceCapable
 public class Todo implements Serializable{
     
@@ -51,7 +51,7 @@ public class Todo implements Serializable{
 	// setter and getter for the task information
 	public void setTask(final String t_task) {this.t_task = t_task;}
 	public String getTask() {return t_task;}
- 
+
 	// setter and getter for the task state
 	public void setState(final String t_state) {this.t_state = t_state;}
 	public String getState() {return t_state;}
@@ -67,7 +67,7 @@ public class Todo implements Serializable{
 	{
  		this.user=us;
 	}  
-                     	     
+                     
 	@Persistent
 	private UserT user;
 	

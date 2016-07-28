@@ -49,6 +49,7 @@ public class RootServlet extends HttpServlet {
 		// store a default version of them. of course we have to check that a user has logged in first
 		UserT existingUser=null;
 		if(user != null) {
+			pm.getFetchPlan().setGroup(FetchGroup.ALL);
 			Key userKey = KeyFactory.createKey(UserT.class.getSimpleName(), user.getUserId());
 			try {
 	            existingUser = pm.getObjectById(UserT.class, userKey);
@@ -60,7 +61,6 @@ public class RootServlet extends HttpServlet {
 	        }	
 			
 			req.setAttribute("currentUser",existingUser);
-			//List<Todo> todoList = existingUser.getTodos();
 			
 			pm.close();
 
@@ -79,13 +79,13 @@ public class RootServlet extends HttpServlet {
 		UserService us = UserServiceFactory.getUserService();
 		User user = us.getCurrentUser();
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		
+
 		// get access to the user. if they do not exist in the datastore then
 		// store a default version of them. of course we have to check that a user has
 		// logged in first
 		UserT existingUser=null;
 		if(user != null) {
-			
+			pm.getFetchPlan().setGroup(FetchGroup.ALL);
 			Key userKey = KeyFactory.createKey(UserT.class.getSimpleName(), user.getUserId());
 			try {
 	            existingUser = pm.getObjectById(UserT.class, userKey);
@@ -97,10 +97,44 @@ public class RootServlet extends HttpServlet {
 	            pm.makePersistent(existingUser);
 	        }
 			
-			pm.close();
+			if (req.getParameter("save") != null) {
+		         saveAction(req, resp,existingUser);
+		         pm.makePersistent(existingUser);
+		         pm.close();
+			}
 		}
-				
 		resp.sendRedirect("/");
+	}
 
+	private void saveAction(HttpServletRequest req, HttpServletResponse resp, UserT user){
+			
+		Todo settings;
+	
+		// get the new task from the form
+		String newTask = "";
+		String newTodo = "";
+		String state = "incomplete";
+		try{
+			newTask = req.getParameter("t_name");
+			newTodo = req.getParameter("t_task");
+		} catch(Exception e) {return;}
+				
+		Date mydate = new Date();
+		
+		// update the task data in the datastore and then redirect to /
+		Key todoKey = KeyFactory.createKey("Todo", mydate.getTime());
+		try {
+			settings = new Todo();
+			settings.setUser(user);
+			settings.setName(newTask);
+			settings.setTask(newTodo);
+			settings.setDate(mydate);
+			settings.setID(todoKey);
+			settings.setState(state);
+			user.getTodos().add(settings);
+			
+		} catch (Exception e) {	// will only fail if the datastore goes down as this is already in the datastore  
+		}
+		
 	}	
 }
