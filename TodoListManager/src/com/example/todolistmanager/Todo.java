@@ -68,6 +68,18 @@ public class Todo implements Serializable{
  		this.user=us;
 	}  
                      
+	// return a task from id
+	public static Todo getTodoUsingTheKey(String key, UserT user) {
+        Todo knownTodo = null;
+        for(int i = 0;i<user.getTodos().size();i++) {
+            if(String.valueOf(user.getTodos().get(i).getId().getId()).equals(key) || String.valueOf(user.getTodos().get(i).getId().getName()).equals(key)) {
+                knownTodo = user.getTodos().get(i);
+                break;
+            }
+        }
+        return knownTodo;
+    }  
+	     	     
 	@Persistent
 	private UserT user;
 	

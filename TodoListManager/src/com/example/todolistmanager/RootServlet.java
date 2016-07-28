@@ -59,8 +59,12 @@ public class RootServlet extends HttpServlet {
 	            existingUser.setEmail(user.getEmail());
 	            pm.makePersistent(existingUser);
 	        }	
+			for(int i = 0; i < existingUser.getTodos().size();i++){
+				System.out.println(existingUser.getTodos().get(i).getName());
+			}
 			
 			req.setAttribute("currentUser",existingUser);
+			//List<Todo> todoList = existingUser.getTodos();
 			
 			pm.close();
 
@@ -75,10 +79,11 @@ public class RootServlet extends HttpServlet {
 
 	// simple post method that updates a users preferences with new email information
 	public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-		
+		String redirection = "";
 		UserService us = UserServiceFactory.getUserService();
 		User user = us.getCurrentUser();
 		PersistenceManager pm = PMF.get().getPersistenceManager();
+		//MemcacheService ms = MemcacheServiceFactory.getMemcacheService();
 
 		// get access to the user. if they do not exist in the datastore then
 		// store a default version of them. of course we have to check that a user has
@@ -96,13 +101,15 @@ public class RootServlet extends HttpServlet {
 	        	existingUser.setEmail(user.getEmail());
 	            pm.makePersistent(existingUser);
 	        }
+			Todo usingTodo=	Todo.getTodoUsingTheKey(req.getParameter("kid"), existingUser);
 			
 			if (req.getParameter("save") != null) {
 		         saveAction(req, resp,existingUser);
 		         pm.makePersistent(existingUser);
-		         pm.close();
-			}
+		    } 
+			pm.close();
 		}
+		
 		resp.sendRedirect("/");
 	}
 

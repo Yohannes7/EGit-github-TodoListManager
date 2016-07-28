@@ -35,7 +35,35 @@
 			diva {list-style-type: none; margin: 0; padding: 0; overflow: hidden;}
 			diva aha {display: block; color: white; text-align: center; padding: 16px; text-decoration: none;}
 			
-	
+			<!--***********************************-->
+			<!--************ ACCORDION ************-->
+			<!--***********************************-->
+			
+			.accordion, .accordion * {-webkit-box-sizing:border-box; -moz-box-sizing:border-box; box-sizing:border-box;}
+			.accordion {overflow:hidden; box-shadow:0px 1px 3px rgba(0,0,0,0.25); border-radius:3px; background:#060000;} 
+			.accordion-section-title {width:100%; padding:0px; display:inline-block; border-bottom:1px solid #1a1a1a;
+			    background:#333; transition:all linear 0.15s; font-size:1.200em; text-shadow:0px 1px 0px #1a1a1a; color:#fff;}
+			.accordion-section-title.active, .accordion-section-title:hover {background:#e31414; text-decoration:none;}
+			.accordion-section:last-child .accordion-section-title {border-bottom:none;}
+			.accordion-section-content {padding:15px; display:none;}
+			
+			<!--***************************************-->										
+			<!--************ SWITCH TOGGLE ************--> 
+			<!--***************************************-->											
+			.toggle {position: absolute; margin-left: -9999px; visibility: hidden;}
+			.toggle + label {display: block; position: relative; cursor: pointer; outline: none; user-select: none;}					
+			input.togglestate + label {padding: 2px; width: 150px; height: 60px; margin-left: auto; margin-right: auto;}
+			input.togglestate + label:before, input.togglestate + label:after {display: block;
+  				position: absolute; top: 0; left: 0; bottom: 0; right: 0; color: #000; font-family: "Roboto Slab", serif; 
+  				font-size: 20px; text-align: center; line-height: 60px;}
+  			input.togglestate + label:before {background-color: #dddddd; content: attr(data-off); transition: transform 0.5s; backface-visibility: hidden;}
+			input.togglestate + label:after {background-color: #8ce196; content: attr(data-on); transition: transform 0.5s; 
+				transform: rotateY(180deg); backface-visibility: hidden;}
+			input.togglestate:checked + label:before {transform: rotateY(180deg);}
+			input.togglestate:checked + label:after {transform: rotateY(0);}									
+														
+														
+			
 		</style>
 	</head>
 	<body>
@@ -59,6 +87,37 @@
 		%>
 				<br/>Welcome ${user.nickname} ! 
 				<a href="${logout_url}">Sign out</a><br/><br/>
+				
+				<div class="accordion">
+				<%
+					for(int i = 0; i<currentUser.getTodos().size();i++){
+						Long kid = null;
+									  								
+						out.println("<div class='accordion-section'>"
+										+ "<a class='accordion-section-title' href='#accordion-"+i+"'><center>" + currentUser.getTodos().get(i).getName() + "</center></a>"
+										+ "<div id='accordion-"+i+"' class='accordion-section-content'>"
+											+ "<form name ='deleteForm' action='/' method='post'>"
+												+ "<ta><tc> Decription : " + currentUser.getTodos().get(i).getTask() + "</tc><br><br>"
+												+ "<tr><td align='center'><ta><input type='submit' value='edit' name='edit'></td></tr>"
+												+ "<ta><tc>Current task state : <b>" + currentUser.getTodos().get(i).getState() + "</b></tc><br><br>"
+												+ "<tr><td align='center'><ta><input type='submit' value='delete' name='delete'></td></tr>"
+												+ "<input id='task_id' type='text' name='kid'  value='"+ currentUser.getTodos().get(i).getId().getId() +"' style='visibility: hidden;'/>"			
+											+ "</form>"
+											+ "<form id='"+ currentUser.getTodos().get(i).getId().getId() +"Tog' name ='stateForm' action='/' method='post'>"
+													+ "<diva><aha><tc>Clic on the toggle button to change the state of the task.</tc></aha></diva>" 
+													+ "<input  id='"+ currentUser.getTodos().get(i).getId().getId() +"'  class='toggle togglestate' type='checkbox' style='visibility: hidden;'>"
+													+ "<label for='"+ currentUser.getTodos().get(i).getId().getId() +"' data-on='complete' data-off='incomplete'></label>"
+													+ "<br><br><center><input type='submit' value='save state' name='savestate' onclick='state_submit()'></center>"	
+													+ "<input id='togbtn_id_Tog' type='text' name='togbtn_id'  value='togbtn"+ i +"' style='visibility: hidden;'/>"
+													+ "<p id='hidden'>"
+													+ "<input id='task_id_Tog' type='text' name='kid'  value='"+ currentUser.getTodos().get(i).getId().getId() +"' style='visibility: hidden;'/>"
+											+ "</form>"
+										+ "</div>"
+									+ "</div>"
+						);
+					}//TODO req.setParameter("state", doit prendre valeur de checkbox)
+				 %>
+				</div><!--end .accordion-->	
 				
 				<br>
 				<!-- add in a small form to allow the user to update the timezone with a number -->
@@ -85,6 +144,39 @@
 		%>
 		
 		<script type="text/javascript">
+		
+		//////////////////////////////
+		// Accordion animation part //
+		/////////////////////////////
+		
+		$(document).ready(function() {
+			
+			function close_accordion_section() {
+				$('.accordion .accordion-section-title').removeClass('active');
+				$('.accordion .accordion-section-content').slideUp(300).removeClass('open');
+			}
+		 			
+			$('.accordion-section-title').click(function(e) {
+				// Grab current anchor value
+				var currentAttrValue = $(this).attr('href');
+		 
+				if($(e.target).is('.active')) {
+					close_accordion_section();
+					
+				}else {
+					close_accordion_section();
+		 
+					// Add active class to section title
+					$(this).addClass('active');
+					// Open up the hidden content panel
+					$('.accordion ' + currentAttrValue).slideDown(300).addClass('open'); 
+					
+				}
+		 
+				e.preventDefault();
+			});
+		});
+			
 		//////////////////////////////////////////////////////////////
 		//////////////////////////////////////////////////////////////
 		
@@ -116,7 +208,7 @@
 		   		return false;
 		  	}
 		}
-				
+		
 		</script>
 	</body>
 </html>
